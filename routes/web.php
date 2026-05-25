@@ -8,6 +8,15 @@ use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 
+Route::get('/lifecycle-test', function () {
+    return response()->json([
+        'php_version' => PHP_VERSION,
+        'timestamp' => now()->toIso8601String(),
+        'message' => 'Laravel is running!',
+        'framework_version' => app()->version(),
+    ]);
+})->name('lifecycle.test');
+
 Route::get('/', function () {
     if (auth()->check()) {
         if (auth()->user()->isAdmin()) {
