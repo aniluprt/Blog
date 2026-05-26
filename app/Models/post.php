@@ -59,4 +59,16 @@ class post extends Model
     {
         return $query->where('is_published', false);
     }
+
+    public function scopeSearch($query, $search)
+    {
+        if (empty($search)) {
+            return $query;
+        }
+
+        return $query->where(function($q) use ($search) {
+            $q->where('title', 'like', '%' . $search . '%')
+                ->orWhere('body', 'like', '%' . $search . '%');
+        });
+    }
 }

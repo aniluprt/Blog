@@ -1,8 +1,36 @@
 @extends('layouts.app')
 
 @section('title', 'Blog')
+
 @section('content')
     <div class="max-w-5xl mx-auto">
+        <!-- Search Bar -->
+        <div class="mb-8">
+            <form method="GET" action="{{ route('posts.index') }}" class="flex gap-3">
+                <div class="flex-1">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                           placeholder="Search posts by title or content..."
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+                <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
+                    Search
+                </button>
+                @if(request('search'))
+                    <a href="{{ route('posts.index') }}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
+                        Clear
+                    </a>
+                @endif
+            </form>
+        </div>
+
+
+        @if(request('search'))
+            <div class="mb-6 text-gray-600">
+                Showing results for: <strong class="text-gray-800">"{{ request('search') }}"</strong>
+                <span class="ml-2 text-sm">({{ $posts->total() }} results found)</span>
+            </div>
+        @endif
+
         <div class="text-center mb-10">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">Blog</h1>
             <p class="text-gray-500">Stories from our community</p>
@@ -17,6 +45,7 @@
                 </p>
             </div>
         @endguest
+
 
         <div class="grid md:grid-cols-2 gap-6">
             @forelse($posts as $post)
@@ -47,13 +76,17 @@
                 </div>
             @empty
                 <div class="col-span-2 text-center py-12 text-gray-500">
-                    No posts yet.
+                    @if(request('search'))
+                        No posts found matching "{{ request('search') }}".
+                    @else
+                        No posts yet.
+                    @endif
                 </div>
             @endforelse
         </div>
 
         <div class="mt-8">
-            {{ $posts->links() }}
+            {{ $posts->appends(request()->query())->links() }}
         </div>
     </div>
 @endsection

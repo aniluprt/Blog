@@ -1,7 +1,34 @@
 @extends('layouts.app')
 
 @section('title', 'Dashboard')
-@section('content')
+
+    @section('content')
+        <div class="max-w-5xl mx-auto mb-6">
+            <form method="GET" action="{{ route('dashboard') }}" class="flex gap-3">
+                <div class="flex-1">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                           placeholder="Search your posts..."
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+                <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
+                    Search
+                </button>
+                @if(request('search'))
+                    <a href="{{ route('dashboard') }}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
+                        Clear
+                    </a>
+                @endif
+            </form>
+        </div>
+
+        @if(request('search'))
+            <div class="max-w-5xl mx-auto mb-4 text-gray-600 text-sm">
+                Showing results for: <strong>"{{ request('search') }}"</strong>
+                <span class="ml-2">({{ $posts->total() }} results)</span>
+            </div>
+        @endif
+
+
     <div class="max-w-5xl mx-auto">
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-2xl font-bold text-gray-800">My Dashboard</h1>

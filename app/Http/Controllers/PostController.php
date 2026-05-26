@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Post;
 use App\Models\Category;
 use App\Http\Requests\StorePostRequest;
@@ -11,14 +10,17 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->get('search');
+
         $posts = Post::with(['user', 'categories'])
             ->published()
+            ->search($search)
             ->latest()
             ->paginate(8);
 
-        return view('posts.index', compact('posts'));
+        return view('posts.index', compact('posts', 'search'));
     }
 
     public function show($slug)
@@ -122,20 +124,29 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $this->authorize('delete', $post);
-
-        $post->delete();
+        $post->comments()->delete(); //delete comments paila
+        $post->categories()->detach(); //  ani relationships
+        $post->delete();  // tespaxi matra post delete garxa
 
         return redirect()->route('dashboard')
             ->with('success', 'Post deleted successfully!');
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
+        $search = $request->get('search');
+
         $posts = auth()->user()->posts()
             ->with('categories')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%')
+                        ->orWhere('body', 'like', '%' . $search . '%');
+                });
+            })
             ->latest()
             ->paginate(10);
 
-        return view('dashboard', compact('posts'));
+        return view('dashboard', compact('posts', 'search'));
     }
 }

@@ -24,10 +24,21 @@ class admincontroller extends Controller
         return view('admin.users', compact('users'));
     }
 
-    public function allPosts()
+    public function allPosts(Request $request)
     {
-        $posts = Post::with('user', 'categories')->latest()->paginate(20);
-        return view('admin.posts', compact('posts'));
+        $search = $request->get('search');
+
+        $posts = Post::with('user', 'categories')
+            ->when($search, function($query, $search) {
+                return $query->where(function($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%')
+                        ->orWhere('body', 'like', '%' . $search . '%');
+                });
+            })
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.posts', compact('posts', 'search'));
     }
 
     public function deletePost(Post $post)
