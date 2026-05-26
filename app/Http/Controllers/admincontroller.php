@@ -1,60 +1,57 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Permission;
-use App\Models\Role;
+
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
+use App\Models\Post;
+use App\Models\Role;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class admincontroller extends Controller
 {
-    public function dashboard(): View
+    public function dashboard()
     {
-        $stats = [
-            'total_users' => User::count(),
-            'total_posts' => \App\Models\Post::count(),
-            'published'   => \App\Models\Post::published()->count(),
-            'drafts'      => \App\Models\Post::where('is_published', false)->count(),
-        ];
+        $totalUsers = User::count();
+        $totalPosts = Post::count();
+        $publishedPosts = Post::where('is_published', true)->count();
 
-        return view('admin.dashboard', compact('stats'));
+        return view('admin.dashboard', compact('totalUsers', 'totalPosts', 'publishedPosts'));
     }
 
-    public function users(): View
+    public function users()
     {
-        $users = User::with(['role'])->latest()->paginate(20);
-
+        $users = User::with('role')->paginate(20);
         return view('admin.users', compact('users'));
     }
 
-    public function roles(): View
+    public function allPosts()
     {
-        $roles       = Role::with('permissions')->get();
-        $permissions = Permission::orderBy('name')->get();
-        return view('admin.roles', compact('roles', 'permissions'));
+        $posts = Post::with('user', 'categories')->latest()->paginate(20);
+        return view('admin.posts', compact('posts'));
     }
 
-    public function updateRolePermissions(Request $request, Role $role): RedirectResponse
+    public function deletePost(Post $post)
     {
-        $request->validate([
-            'permission_ids'=> ['nullable', 'array'],
-            'permission_ids.*' => ['exists:permissions,id'],
-        ]);
-
-        $role->permissions()->sync($request->permission_ids ?? []);
-        return redirect()
-            ->route('admin.roles')
-            ->with('success', "Permissions updated for role: {$role->name}");
+        $post->delete();
+        return redirect()->route('admin.posts')->with('success', 'Post deleted successfully');
     }
 
-    public function toggleUserActive(User $user): RedirectResponse
+    public function roles()
     {
-        $user->update(['is_active' => ! $user->is_active]);
-        $status = $user->is_active ? 'activated' : 'suspended';
-        return redirect()
-            ->route('admin.users')
-            ->with('success', "User {$user->name} has been {$status}.");
+        $roles = Role::with('permissions')->get();
+        return view('admin.roles', compact('roles'));
+    }
+
+    public function updateRolePermissions(Request $request, Role $role)
+    {
+        $role->permissions()->sync($request->permissions ?? []);
+        return back()->with('success', 'Permissions updated');
+    }
+
+    public function toggleUserActive(User $user)
+    {
+        $user->is_active = !$user->is_active;
+        $user->save();
+        return back()->with('success', 'User status updated');
     }
 }

@@ -27,6 +27,10 @@ class PostController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
+        if (!$post->is_published && !auth()->user()?->isAdmin()) {     //can see unpublished post too by admin
+            abort(404);
+        }
+
         $post->increment('view_count');
 
         return view('posts.show', compact('post'));
