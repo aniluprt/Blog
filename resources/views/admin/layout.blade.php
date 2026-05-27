@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <!-- Admin Navigation Bar -->
+
     <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-8">
@@ -38,7 +38,7 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+
     <main class="max-w-7xl mx-auto px-4 py-6">
         @if(session('success'))
             <div class="bg-green-100 text-green-700 border border-green-200 rounded p-3 mb-4 text-sm">

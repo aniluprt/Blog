@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', $post->title)
+
 @section('content')
     <div class="max-w-3xl mx-auto">
         <div class="bg-white border border-gray-200 rounded-lg p-8 mb-6">
@@ -29,11 +30,14 @@
             </div>
 
             @auth
-                @can('update', $post)
-                    <div class="flex gap-3 pt-4 border-t border-gray-200">
+                <div class="flex gap-3 pt-4 border-t border-gray-200">
+                    @if(auth()->user()->id === $post->user_id)
                         <a href="{{ route('posts.edit', $post) }}" class="bg-yellow-500 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-yellow-600">
                             Edit Post
                         </a>
+                    @endif
+
+                    @if(auth()->user()->id === $post->user_id || auth()->user()->isAdmin())
                         <form action="{{ route('posts.destroy', $post) }}" method="POST">
                             @csrf
                             @method('DELETE')
@@ -41,8 +45,8 @@
                                 Delete Post
                             </button>
                         </form>
-                    </div>
-                @endcan
+                    @endif
+                </div>
             @else
                 <div class="bg-gray-50 p-4 text-center rounded text-sm text-gray-600">
                     <a href="{{ route('login') }}" class="text-blue-500">Login</a> to edit or delete this post

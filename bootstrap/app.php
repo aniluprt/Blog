@@ -15,9 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'active'     => EnsureUserIsActive::class,
-            'permission' => CheckPermission::class,
-            'log.posts'  => LogRequestDetails::class,
+            'active'  => EnsureUserIsActive::class,
+            'permission'=> CheckPermission::class,
+            'log.posts'=> LogRequestDetails::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

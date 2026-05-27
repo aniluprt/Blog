@@ -36,14 +36,17 @@ class admincontroller extends Controller
                 });
             })
             ->latest()
-            ->paginate(20);
+            ->paginate(8);
 
         return view('admin.posts', compact('posts', 'search'));
     }
 
     public function deletePost(Post $post)
     {
+        $post->comments()->delete();
+        $post->categories()->detach();
         $post->delete();
+
         return redirect()->route('admin.posts')->with('success', 'Post deleted successfully');
     }
 

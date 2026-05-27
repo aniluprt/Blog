@@ -18,20 +18,34 @@
             }
         }
     </script>
+
+    <style>
+        {
+            white-space: nowrap;
+        }
+
+        .inline-block {
+            display: inline-block;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
 
 <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
     <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
         <a href="{{ route('welcome') }}" class="text-xl font-bold text-gray-800 hover:text-blue-500">
-            BlogSystem
+             BlogSystem
         </a>
         <div class="flex gap-5 items-center">
             <a href="{{ route('posts.index') }}" class="text-sm text-gray-600 hover:text-blue-500">Blog</a>
 
             @auth
-                <a href="{{ route('dashboard') }}" class="text-sm text-gray-600 hover:text-blue-500">Dashboard</a>
-                <a href="{{ route('posts.create') }}" class="text-sm text-gray-600 hover:text-blue-500">Create Post</a>
+                @if(auth()->user()->isAdmin())
+                    <a href="{{ route('admin.dashboard') }}" class="text-sm text-gray-600 hover:text-blue-500">Admin Panel</a>
+                @else
+                    <a href="{{ route('dashboard') }}" class="text-sm text-gray-600 hover:text-blue-500">Dashboard</a>
+                    <a href="{{ route('posts.create') }}" class="text-sm text-gray-600 hover:text-blue-500">Create Post</a>
+                @endif
                 <span class="text-sm text-gray-500">{{ auth()->user()->name }}</span>
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
